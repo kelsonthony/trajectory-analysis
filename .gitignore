@@ -1,0 +1,67 @@
+# Arquivos e diretórios do R
+.Rhistory
+.Rapp.history
+.RData
+.Ruserdata
+.Rproj.user/
+.Rproj.user/**
+
+# Diretórios temporários
+.Rcheck/
+.Rcheck/**
+
+# Pacotes instalados localmente
+packrat/
+renv/library/
+renv/staging/
+renv/python/
+
+# Logs e cache
+*.log
+*.out
+*.aux
+*.toc
+*.nav
+*.snm
+*.vrb
+*.bak
+*.tmp
+*.swp
+*.DS_Store
+*.RDataTmp
+*.RDataBackup
+
+# Relatórios intermediários (ex: knit, quarto, latex)
+*.knit.md
+*.utf8.md
+*.pdf
+*.tex
+*.html
+*.docx
+cache/
+*_cache/
+*_files/
+
+# IDEs
+.vscode/
+.idea/
+*.code-workspace
+
+# Outros arquivos sensíveis ou específicos de ambiente
+.env
+*.sqlite
+*.db
+*.csv
+*.tsv
+*.sav
+*.rds
+*.RData
+*.feather
+*.parquet
+*.xlsx
+# Arquivos de build R CMD check
+.Rbuildignore
+
+data/input/*
+data/output/files/*
+data/output/img/*
