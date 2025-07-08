@@ -63,5 +63,4 @@ cache/
 .Rbuildignore
 
 data/input/*
-data/output/files/*
-data/output/img/*
+data/output/*
