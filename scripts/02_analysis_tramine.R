@@ -25,7 +25,7 @@ week_cols <- as.character(1:30)
 # ===============================
 # 2. Preparação do objeto de sequência
 # ===============================
-estados <- c("ALTA", "ENF/ALCON", "UCINCO", "UCINCA", "UTIN", "ÓBITO")
+estados <- c("ALT", "ENF", "UCO", "UCA", "UTI", "OBI")
 traj[, (week_cols) := lapply(.SD, factor, levels = estados), .SDcols = week_cols]
 
 seq_obj <- seqdef(traj[, ..week_cols], alphabet = estados, states = estados, right = "DEL")

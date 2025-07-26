@@ -17,7 +17,7 @@ run_descriptive_analysis <- function() {
   input_file <- list.files(input_dir, pattern = "^trajetoria_.*\\.csv$", full.names = TRUE)[1]
 
   if (is.na(input_file) || input_file == "") {
-    stop("❌ Nenhum arquivo CSV de trajetória encontrado em: ", input_dir)
+    stop("Nenhum arquivo CSV de trajetória encontrado em: ", input_dir)
   }
 
   # 2. Carregar a matriz de trajetória
@@ -92,3 +92,5 @@ run_descriptive_analysis <- function() {
 if (sys.nframe() == 0) {
   run_descriptive_analysis()
 }
+
+run_descriptive_analysis()

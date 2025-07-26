@@ -17,13 +17,13 @@ run_group_analysis <- function() {
 
   input_file <- list.files(input_dir, pattern = "^trajetoria_.*\\.csv$", full.names = TRUE)[1]
   if (is.na(input_file) || input_file == "") {
-    stop("❌ Nenhum arquivo CSV de trajetória encontrado em: ", input_dir)
+    stop("Nenhum arquivo CSV de trajetória encontrado em: ", input_dir)
   }
 
   # 1. Leitura
   traj <- fread(input_file)
   week_cols <- as.character(1:30)
-  estados <- c("ALTA", "ENF/ALCON", "UCINCO", "UCINCA", "UTIN", "ÓBITO")
+  estados <- c("ALT", "ENF", "UCO", "UCA", "UTI", "OBI")
   traj[, (week_cols) := lapply(.SD, factor, levels = estados), .SDcols = week_cols]
 
   # 2. Objeto de sequência
@@ -101,3 +101,6 @@ run_group_analysis <- function() {
 if (sys.nframe() == 0) {
   run_group_analysis()
 }
+
+# Run
+run_group_analysis()
