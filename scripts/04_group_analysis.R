@@ -44,53 +44,54 @@ run_group_analysis <- function() {
   dev.off()
 
   # 6. Clustering (fixado em k = 5 como exemplo)
-  agnes_fit <- agnes(dist_mat, diss = TRUE, method = "ward")
-  traj$grupo <- cutree(agnes_fit, k = 5)
+agnes_fit <- agnes(dist_mat, diss = TRUE, method = "ward")
+traj$cluster <- paste0("type ", cutree(agnes_fit, k = 5))
 
-  # 7. Dendrograma
-  png(file.path(output_dir, paste0("dendrograma_trajetorias_", timestamp, ".png")), width = 1000, height = 600)
-  plot(agnes_fit, which.plots = 2, main = "Dendrograma das Trajetórias")
-  dev.off()
+# 7. Dendrograma
+png(file.path(output_dir, paste0("dendrograma_trajetorias_", timestamp, ".png")), width = 1000, height = 600)
+plot(agnes_fit, which.plots = 2, main = "Dendrograma das Trajetórias")
+dev.off()
 
-  # 8. Gráfico por grupo
-  png(file.path(output_dir, paste0("trajetorias_por_grupo_", timestamp, ".png")), width = 1000, height = 600)
-  seqdplot(seq_obj, group = traj$grupo, border = NA, main = "Trajetórias por Grupo")
-  dev.off()
+# 8. Gráfico por cluster
+png(file.path(output_dir, paste0("trajetorias_por_cluster_", timestamp, ".png")), width = 1000, height = 600)
+seqdplot(seq_obj, group = traj$cluster, border = NA, main = "Trajetórias por Cluster")
+dev.off()
 
-  # 9. Heatmap por grupo
-  traj_melt <- melt(traj[, c("grupo", ..week_cols)], id.vars = "grupo", variable.name = "semana", value.name = "estado")
-  traj_summary <- traj_melt %>%
-    group_by(grupo, estado) %>%
-    summarise(prop = n() / nrow(traj), .groups = "drop")
+# 9. Heatmap por cluster
+traj_melt <- melt(traj[, c("cluster", ..week_cols)], id.vars = "cluster", variable.name = "semana", value.name = "estado")
+traj_summary <- traj_melt %>%
+  group_by(cluster, estado) %>%
+  summarise(prop = n() / nrow(traj), .groups = "drop")
 
-  png(file.path(output_dir, paste0("heatmap_por_grupo_", timestamp, ".png")), width = 1000, height = 600)
-  ggplot(traj_summary, aes(x = grupo, y = estado, fill = prop)) +
-    geom_tile() +
-    scale_fill_viridis_c() +
-    labs(title = "Distribuição Média de Estados por Grupo", x = "Grupo", y = "Estado") +
-    theme_minimal()
-  dev.off()
+png(file.path(output_dir, paste0("heatmap_por_cluster_", timestamp, ".png")), width = 1000, height = 600)
+ggplot(traj_summary, aes(x = cluster, y = estado, fill = prop)) +
+  geom_tile() +
+  scale_fill_viridis_c() +
+  labs(title = "Distribuição Média de Estados por Cluster", x = "Cluster", y = "Estado") +
+  theme_minimal()
+dev.off()
 
-  # 10. Curva acumulada dos estados
-  traj_long <- melt(traj[, c("grupo", ..week_cols)], id.vars = "grupo", variable.name = "semana", value.name = "estado")
-  traj_long$semana <- as.integer(as.character(traj_long$semana))
+# 10. Curva acumulada dos estados
+traj_long <- melt(traj[, c("cluster", ..week_cols)], id.vars = "cluster", variable.name = "semana", value.name = "estado")
+traj_long$semana <- as.integer(as.character(traj_long$semana))
 
-  curva_estados <- traj_long %>%
-    group_by(semana, estado) %>%
-    summarise(freq = n(), .groups = "drop") %>%
-    group_by(semana) %>%
-    mutate(prop = freq / sum(freq))
+curva_estados <- traj_long %>%
+  group_by(semana, estado) %>%
+  summarise(freq = n(), .groups = "drop") %>%
+  group_by(semana) %>%
+  mutate(prop = freq / sum(freq))
 
-  png(file.path(output_dir, paste0("curva_acumulada_estados_", timestamp, ".png")), width = 1000, height = 600)
-  ggplot(curva_estados, aes(x = semana, y = prop, fill = estado)) +
-    geom_area(alpha = 0.7, color = "white") +
-    labs(title = "Proporção Acumulada dos Estados por Semana", x = "Semana", y = "Proporção") +
-    theme_minimal()
-  dev.off()
+png(file.path(output_dir, paste0("curva_acumulada_estados_", timestamp, ".png")), width = 1000, height = 600)
+ggplot(curva_estados, aes(x = semana, y = prop, fill = estado)) +
+  geom_area(alpha = 0.7, color = "white") +
+  labs(title = "Proporção Acumulada dos Estados por Semana", x = "Semana", y = "Proporção") +
+  theme_minimal()
+dev.off()
 
-  # 11. Salvar base com cluster
-  output_csv <- file.path(output_dir, paste0("Trajetoria_neonatos_cluster_", timestamp, ".csv"))
-  fwrite(traj, output_csv)
+# 11. Salvar base com cluster
+output_csv <- file.path(output_dir, paste0("Trajetoria_neonatos_cluster_", timestamp, ".csv"))
+fwrite(traj, output_csv)
+
 
   message("✅ Script finalizado com sucesso.")
   message("📁 Cluster salvo em: ", output_csv)
