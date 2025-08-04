@@ -51,16 +51,13 @@ cache/
 .env
 *.sqlite
 *.db
-*.csv
+
 *.tsv
 *.sav
 *.rds
 *.RData
 *.feather
 *.parquet
-*.xlsx
+
 # Arquivos de build R CMD check
 .Rbuildignore
-
-data/input/*
-data/output/*
