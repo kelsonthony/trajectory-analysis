@@ -1,5 +1,5 @@
 # ==========================================
-# 06 - CLUSTERING BASEADO NO TEMPO EM CADA ESTADO
+# 07 - CLUSTERING BASEADO NO TEMPO EM CADA ESTADO (CORRIGIDO)
 # ==========================================
 
 # Pacotes
@@ -26,36 +26,45 @@ if (is.na(csv_mais_recente)) {
   stop("❌ Nenhum arquivo de trajetória encontrado em 'data/output'.")
 }
 
+message("✅ Arquivo carregado: ", csv_mais_recente)
+
 # Carregar a matriz de trajetória
 traj <- fread(csv_mais_recente)
 
-# Verificar se 'n_neonato' existe
-if (!"n_neonato" %in% colnames(traj)) {
-  stop("❌ A coluna 'n_neonato' não foi encontrada no arquivo de entrada.")
+# Detectar coluna identificadora
+col_id <- grep("^(id|n_neonato)$", colnames(traj), value = TRUE)
+
+if (length(col_id) == 0) {
+  stop("❌ Nenhuma coluna identificadora encontrada ('id' ou 'n_neonato').")
+} else {
+  message("🔎 Coluna identificadora usada: ", col_id)
 }
 
-# Derreter o formato largo para longo
+# Remover coluna 'cluster' anterior se existir
+if ("cluster" %in% colnames(traj)) {
+  traj <- traj %>% select(-cluster)
+}
+
+# Converter para formato longo
 traj_long <- traj %>%
-  select(-grupo) %>%  # <- adicionado para remover a coluna "grupo"
-  pivot_longer(cols = -n_neonato, names_to = "semana", values_to = "estado") %>%
+  pivot_longer(cols = -all_of(col_id), names_to = "semana", values_to = "estado") %>%
   mutate(semana = as.integer(semana))
 
-
-# Contar tempo total de cada paciente em cada estado
+# Contar tempo total em cada estado por paciente
 tempo_por_estado <- traj_long %>%
-  group_by(n_neonato, estado) %>%
+  group_by(across(all_of(col_id)), estado) %>%
   summarise(tempo = n(), .groups = "drop") %>%
   pivot_wider(names_from = estado, values_from = tempo, values_fill = 0)
 
-# Remover coluna ID para clustering
-matriz_cluster <- tempo_por_estado %>% select(-n_neonato)
+# Criar matriz para cluster (sem o identificador)
+matriz_cluster <- tempo_por_estado %>% select(-all_of(col_id))
 
 # Clustering hierárquico
 dist_tempo <- dist(matriz_cluster)
 agrupamento <- agnes(dist_tempo, method = "ward")
 grupo_tempo <- cutree(agrupamento, k = 3)
 
-# Anexar grupo ao dataframe
+# Adicionar coluna de grupo
 tempo_por_estado$grupo <- as.factor(grupo_tempo)
 
 # Estatísticas por grupo
@@ -65,7 +74,7 @@ summary_por_grupo <- tempo_por_estado %>%
 
 print(summary_por_grupo)
 
-# Gráfico de barras com médias por grupo
+# Preparar gráfico
 summary_por_grupo_long <- summary_por_grupo %>%
   pivot_longer(
     cols = where(is.numeric),
@@ -88,13 +97,19 @@ grafico <- ggplot(summary_por_grupo_long, aes(x = estado, y = tempo_medio, fill 
 
 ggsave(plot_file, plot = grafico, width = 10, height = 6, dpi = 300)
 
-# Salvar resultado com grupo
+# Salvar resultado com grupos
 output_csv <- file.path(
   dir_out,
   paste0("agrupamento_por_tempo_", format(Sys.time(), "%Y%m%d_%H%M"), ".csv")
 )
-fwrite(tempo_por_estado, output_csv)
 
-message("✅ Script 06 finalizado com sucesso.")
+# Renomear coluna identificadora para 'id' ao exportar (padronização)
+tempo_por_estado_export <- tempo_por_estado
+colnames(tempo_por_estado_export)[1] <- "id"
+
+fwrite(tempo_por_estado_export, output_csv)
+
+# Mensagem final
+message("✅ Script 07 finalizado com sucesso.")
 message("📊 Arquivo salvo: ", output_csv)
 message("📈 Gráfico salvo: ", plot_file)
