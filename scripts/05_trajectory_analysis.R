@@ -75,7 +75,7 @@ fviz_nbclust(as.matrix(dist_mat), FUN = hcut, method = "silhouette", k.max = 6) 
 dev.off()
 
 # Clusterização hierárquica
-k <- 4
+k <- 5
 agnes_fit <- agnes(dist_mat, diss = TRUE, method = "ward")
 traj_clean$cluster <- paste0("type ", cutree(agnes_fit, k = k))
 
