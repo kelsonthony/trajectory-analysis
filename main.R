@@ -1,5 +1,5 @@
 # main.R
-source("scripts/00_mount_trajectory.R")
+source("scripts/01_mount_trajectory.R")
 source("scripts/01_generate_trajectory.R")
 
 # Gera arquivos com timestamp

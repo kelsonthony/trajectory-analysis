@@ -2,13 +2,29 @@
 # 05 - ANÁLISE COMPLETA DE TRAJETÓRIAS (CORRIGIDO FINAL)
 # ================================================================
 
-library(TraMineR)
-library(data.table)
-library(cluster)
-library(factoextra)
-library(ggplot2)
-library(reshape2)
-library(dplyr)
+# Lista de pacotes necessários
+packages_needed <- c(
+  "TraMineR",
+  "data.table",
+  "cluster",
+  "factoextra",
+  "ggplot2",
+  "reshape2",
+  "dplyr",
+  "readxl",
+  "dendextend",   # <-- adicionado
+  "viridisLite"   # <-- adicionado
+)
+
+# Instalar pacotes que não estão presentes
+packages_to_install <- packages_needed[!(packages_needed %in% installed.packages()[, "Package"])]
+if (length(packages_to_install) > 0) {
+  install.packages(packages_to_install)
+}
+
+# Carregar todos os pacotes
+invisible(lapply(packages_needed, library, character.only = TRUE))
+
 
 # Caminhos
 input_dir <- "data/output"
@@ -63,9 +79,14 @@ k <- 5
 agnes_fit <- agnes(dist_mat, diss = TRUE, method = "ward")
 traj_clean$cluster <- paste0("type ", cutree(agnes_fit, k = k))
 
-# Dendrograma
+# Dendrograma colorido por cluster  (ÚNICA ALTERAÇÃO DE LÓGICA)
+hc   <- as.hclust(agnes_fit)
+dend <- stats::as.dendrogram(hc)
+dend <- dendextend::color_branches(dend, k = k, col = viridisLite::viridis(k))
+
 png(file.path(output_dir, paste0("dendrograma_trajetorias_", timestamp, ".png")), width = 1000, height = 600)
-plot(agnes_fit, which.plots = 2, main = "Dendrograma das Trajetórias")
+plot(dend, main = "Dendrograma das Trajetórias (colorido por cluster)")
+dendextend::rect.dendrogram(dend, k = k, border = "grey30", lty = 1)
 dev.off()
 
 # Gráfico de trajetórias por cluster
