@@ -1,8 +1,8 @@
 # ================================================================
-# APGAR por cluster — versão COLORIDA (1 par de figuras por TYPE)
-# Saídas por cluster:
-#   1) apgar_violin_box_TYPE-<n>_<ts>.png
-#   2) apgar_hist_kde_TYPE-<n>_<ts>.png
+# APGAR por cluster — Histogramas COLORIDOS (1 gráfico por TYPE)
+#  -> Sem violinos, densidade apenas linha (sem fill)
+#  -> Fundo totalmente branco (panel + plot)
+# Saída: apgar_hist_kde_TYPE-<n>_<ts>.png
 # ================================================================
 
 # ---------------- Pacotes ----------------
@@ -18,9 +18,11 @@ out_dir <- "data/output"
 if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
 ts <- format(Sys.time(), "%Y%m%d_%H%M")
 
-# Paleta (colorblind-friendly)
-pal <- c(APGAR_1 = "#2E86AB",  # azul
-         APGAR_5 = "#E76F51")  # laranja
+# Paleta (fill claro + linha mais escura, colorblind-friendly)
+pal_fill <- c(APGAR_1 = "#A6CEE3",  # azul claro
+              APGAR_5 = "#F4A09C")  # salmão
+pal_line <- c(APGAR_1 = "#1F78B4",  # azul mais escuro
+              APGAR_5 = "#E76F51")  # salmão/laranja escuro
 
 # ---------------- Leitura e preparação ----------------
 df_raw <- readxl::read_excel(in_path, sheet = sheet_name)
@@ -47,60 +49,52 @@ df <- dplyr::filter(df, !is.na(cluster_num))
 df$cluster_num <- factor(df$cluster_num, levels = c("1","2","3","4"))
 df$cluster_lab <- factor(paste0("TYPE ", df$cluster_num), levels = paste0("TYPE ", c(1,2,3,4)))
 
-# dados longos
+# dados longos (só o necessário)
 df_long <- df |>
   tidyr::pivot_longer(cols = c("APGAR_1","APGAR_5"),
                       names_to = "Apgar", values_to = "score") |>
   dplyr::filter(!is.na(score))
 
-# ---------------- Tema ----------------
-theme_clean <- function(base_size = 13){
-  theme_minimal(base_size = base_size) +
+# ---------------- Tema branco e limpo ----------------
+theme_white_clean <- function(base_size = 13){
+  theme_bw(base_size = base_size) +
     theme(
       panel.grid.major = element_line(size = 0.25, colour = "grey85"),
       panel.grid.minor = element_blank(),
-      strip.text = element_text(face = "bold"),
-      plot.title = element_text(face = "bold")
+      plot.background  = element_rect(fill = "white", colour = NA),
+      panel.background = element_rect(fill = "white", colour = NA),
+      strip.background = element_rect(fill = "white", colour = "grey80"),
+      strip.text       = element_text(face = "bold"),
+      plot.title       = element_text(face = "bold")
     )
 }
 
-# ---------------- Geração por cluster ----------------
+# ---------------- Geração por TYPE ----------------
 for (cl in levels(df$cluster_num)) {
   lab <- paste0("TYPE ", cl)
   dfc <- dplyr::filter(df_long, cluster_lab == lab)
 
-  # 1) Violino + box + pontos (cores por APGAR)
-  p1 <- ggplot(dfc, aes(x = Apgar, y = score, fill = Apgar, colour = Apgar)) +
-    geom_violin(alpha = 0.35, linewidth = 0.6) +
-    geom_boxplot(width = 0.12, outlier.shape = NA, fill = "white", alpha = 0.8, colour = "black") +
-    geom_jitter(width = 0.10, height = 0, alpha = 0.5, size = 1.2, colour = "black") +
-    scale_fill_manual(values = pal) +
-    scale_color_manual(values = pal) +
-    scale_y_continuous(breaks = 0:10, limits = c(0, 10)) +
-    labs(title = paste0("Apgar 1 e 5 — ", lab), x = NULL, y = "Escore Apgar") +
-    guides(colour = "none", fill = "none") +
-    theme_clean()
-
-  out1 <- file.path(out_dir, paste0("apgar_violin_box_", gsub(" ", "-", lab), "_", ts, ".png"))
-  ggsave(out1, p1, width = 7.5, height = 6, dpi = 300)
-
-  # 2) Histogramas + densidade (cores por APGAR; dois painéis)
-  p2 <- ggplot(dfc, aes(x = score, fill = Apgar, colour = Apgar)) +
-    geom_histogram(aes(y = ..density..), bins = 12, alpha = 0.5, position = "identity") +
-    geom_density(linewidth = 1) +
+  p_hist <- ggplot(dfc, aes(x = score, fill = Apgar)) +
+    # Histograma com alpha para ver a linha por cima
+    geom_histogram(aes(y = ..density..), bins = 12, alpha = 0.55,
+                   position = "identity", colour = NA) +
+    # Densidade apenas com linha (sem fill) para não cobrir o histograma
+    geom_density(aes(colour = Apgar), linewidth = 1.1, fill = NA) +
     facet_wrap(~ Apgar, ncol = 2) +
-    scale_fill_manual(values = pal) +
-    scale_color_manual(values = pal) +
+    scale_fill_manual(values = pal_fill) +
+    scale_color_manual(values = pal_line) +
     scale_x_continuous(breaks = 0:10, limits = c(0, 10)) +
-    labs(title = paste0("Histograma com densidade — ", lab),
-         x = "Escore Apgar", y = "Densidade") +
-    theme_clean() +
+    labs(
+      title = paste0("Distribuição dos Escores de Apgar — ", lab),
+      x = "Escore", y = "Densidade"
+    ) +
+    theme_white_clean() +
     theme(legend.position = "none")
 
-  out2 <- file.path(out_dir, paste0("apgar_hist_kde_", gsub(" ", "-", lab), "_", ts, ".png"))
-  ggsave(out2, p2, width = 10, height = 5.5, dpi = 300)
+  out_file <- file.path(out_dir, paste0("apgar_hist_kde_", gsub(" ", "-", lab), "_", ts, ".png"))
+  ggsave(out_file, p_hist, width = 10, height = 5.5, dpi = 300, bg = "white")
 
-  message("✔️  Gerados (coloridos) para ", lab, ":\n - ", out1, "\n - ", out2)
+  message("✔️  Gerado (hist + densidade) para ", lab, ":\n - ", out_file)
 }
 
-cat("✅ Finalizado! Arquivos coloridos em: ", normalizePath(out_dir), "\n", sep = "")
+cat("✅ Finalizado! Arquivos em: ", normalizePath(out_dir), "\n", sep = "")
