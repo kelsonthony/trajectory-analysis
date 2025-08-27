@@ -12,7 +12,7 @@ if (length(to_install)) install.packages(to_install, dependencies = TRUE)
 invisible(lapply(pkgs, library, character.only = TRUE))
 
 # ---------------- Config ----------------
-in_xlsx_candidates <- c("data/input/Banco_de_dados_final_0708_2_PREMATURO.xlsx")
+in_xlsx_candidates <- c("data/input/Banco_de_dados_final_0708_2_PREMATURO_TRATE.xlsx")
 in_xlsx <- NULL
 for (p in in_xlsx_candidates) if (file.exists(p)) { in_xlsx <- p; break }
 if (is.null(in_xlsx)) stop("❌ Arquivo de entrada não encontrado.")

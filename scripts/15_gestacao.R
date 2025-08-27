@@ -12,8 +12,7 @@ invisible(lapply(pkgs, library, character.only = TRUE))
 
 # -------- Config --------
 input_candidates <- c(
-  "data/input/Banco_de_dados_final_0708_2_GESTACAO.xlsx",
-  "data/input/Banco_de_dados_final_0708_2.xlsx"
+  "data/input/Banco_de_dados_final_0708_2_GESTACAO_TRATE.xlsx"
 )
 input_xlsx <- NULL
 for (p in input_candidates) if (file.exists(p)) { input_xlsx <- p; break }
