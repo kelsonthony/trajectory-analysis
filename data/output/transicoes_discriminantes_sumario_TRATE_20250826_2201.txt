@@ -1,0 +1,9 @@
+== RESUMO: transições/subsequências discriminantes por cluster ==
+           Length Class          Mode     
+eseq       1376   seqelist       list     
+constraint    6   seqeconstraint list     
+subseq       32   seqelist       list     
+data         12   data.frame     list     
+type          1   -none-         character
+labels        4   -none-         character
+bonferroni    2   -none-         list     
