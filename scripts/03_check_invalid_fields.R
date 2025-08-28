@@ -3,9 +3,17 @@
 # Diagnóstico de estados inválidos, NAs ou inconsistências
 # ===============================================
 
-library(data.table)
-library(stringr)
+# --------- Pacotes necessários ---------
+packages_needed <- c("data.table", "stringr")
 
+for (pkg in packages_needed) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg, repos = "https://cloud.r-project.org")
+  }
+  library(pkg, character.only = TRUE)
+}
+
+# --------- Resto do código ---------
 # Caminho do arquivo CSV mais recente
 input_file <- list.files("data/output", pattern = "^trajetoria_.*\\.csv$", full.names = TRUE)[1]
 if (is.na(input_file) || input_file == "") stop("❌ Nenhum arquivo de trajetória encontrado.")

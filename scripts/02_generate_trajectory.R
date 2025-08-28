@@ -9,8 +9,8 @@ library(readxl)
 library(openxlsx)
 
 gerar_trajetoria <- function(
-  input_path = "data/input/trajetoria_montada.xlsx",
-  sheet_name = "RTrajet",
+  input_path = "data/output/trajetoria_montada.xlsx",
+  sheet_name = "Sheet 1",
   limite_semanas = 30
 ) {
   # 1. Verifica se o arquivo existe
