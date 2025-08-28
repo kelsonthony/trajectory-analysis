@@ -1,0 +1,16 @@
+Var1,Var2,Freq
+eseq,Length,1376
+constraint,Length,   6
+subseq,Length,  32
+data,Length,   2
+type,Length,   1
+eseq,Class,seqelist
+constraint,Class,seqeconstraint
+subseq,Class,seqelist
+data,Class,data.frame
+type,Class,-none-
+eseq,Mode,list
+constraint,Mode,list
+subseq,Mode,list
+data,Mode,list
+type,Mode,character

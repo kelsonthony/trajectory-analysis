@@ -1,0 +1,81 @@
+Variavel,Total (N),type 1,type 2,type 3,type 4
+N,1376,514,617,123,122
+"Idade gestacional, semanas",32.2 (3.2),32.1 (2.0),34.5 (1.1),28.0 (2.0),27.0 (3.1)
+"Peso ao nascer,
+gramas",1754.5 (633.8),1586.7 (415.5),2190.4 (492.1),1046.4 (371.3),971.2 (493.5)
+Apgar 1º min*,7.1 (1.8),7.2 (1.6),7.5 (1.5),6.1 (2.1),5.4 (2.3)
+Apgar 5º min*,8.3 (1.2),8.4 (1.1),8.6 (0.8),7.8 (1.5),7.2 (1.7)
+"Reanimação
+Sim",34.3%,32.7%,24.8%,58.5%,64.8%
+"Reanimação
+Não",65.7%,67.3%,75.2%,41.5%,35.2%
+"Sexo
+Masculino",55.7%,50.6%,58.3%,58.5%,61.5%
+"Sexo
+Feminino",44.3%,49.4%,41.7%,41.5%,38.5%
+"Suporte de O2
+Sim",69.3%,70%,64.8%,77%,81.7%
+"Suporte de O2
+Não",30.5%,30%,35%,21.3%,18.3%
+VM,28.1%,26.9%,22.4%,48.8%,41%
+VNI,23%,22.8%,19.1%,41.5%,24.6%
+CNAF,5.4%,4.9%,3.1%,22.8%,1.6%
+CPAP,65.2%,66.9%,61.1%,78.9%,64.8%
+HOOD,31.7%,25.5%,38.8%,29.4%,27.3%
+Cateter nasal,19.1%,19.3%,16%,39%,13.9%
+"Tipo de parto
+Cesárea",0%,0%,0%,0%,0%
+"Tipo de parto
+Vaginal",34.7%,30.9%,33.5%,41.5%,49.2%
+"Tipo de parto
+Sem informação",65.3%,69.1%,66.5%,58.5%,50.8%
+Hemorragia pulmonar,5.6%,3.3%,1.1%,16.3%,27%
+"Hemorragia intracraniana*
+Não",82.1%,80%,94.7%,41.5%,68.9%
+"Hemorragia intracraniana*
+Grau I",7.8%,9.9%,3.1%,24.4%,6.6%
+"Hemorragia intracraniana*
+Grau II",6.4%,7.4%,1.6%,21.1%,11.5%
+"Hemorragia intracraniana*
+Grau III",1.7%,0.8%,0.5%,8.1%,5.7%
+"Hemorragia intracraniana*
+Grau IV",1.9%,1.9%,0.2%,4.9%,7.4%
+Hipertensão pulmonar,5.1%,4.5%,2.4%,8.1%,18%
+Pneumonia congênita,5.9%,6.2%,4.4%,8.1%,9.8%
+Pneumonia adquirida,5.8%,6.2%,3.4%,14.6%,7.4%
+Enterocolite necrosante,2.7%,3.7%,0.3%,8.9%,4.1%
+Infecção presumida,34.9%,37.2%,27.1%,52%,47.5%
+Infecção tardia,7%,8.4%,3.2%,18.7%,8.2%
+Sepse,52.2%,64%,31.1%,87%,73.8%
+Uso de antibióticos,63.9%,74.5%,44.4%,93.5%,87.7%
+Sífilis,5.3%,6.4%,4.7%,5.7%,3.3%
+"Características maternas
+Idade, anos",27.3 (7.1),27.1 (7.1),27.5 (7.1),28 (7.2),26.2 (7.2)
+N. de gestação prévia,1.7 (10.7),2.1 (17.3),1.5 (1.7),1.5 (1.5),1.4 (1.9)
+N. consultas prenatal,5.7 (3.1),5.7 (3),6 (3.2),5.3 (2.7),4.8 (3.1)
+"Escolarização
+Superior completo",7.9%,7.4%,7.3%,10.6%,10.7%
+"Escolarização
+Superior incompleto",5.1%,4.9%,5.2%,4.1%,6.6%
+"Escolarização
+Médio completo",0%,0%,0%,0%,0%
+"Escolarização
+Médio incompleto",0%,0%,0%,0%,0%
+"Escolarização
+Fundamental incompleto",12%,12.1%,12.3%,8.9%,13.1%
+"Escolarização
+Fundamental completo",3.6%,1.9%,4.9%,3.3%,4.9%
+"Escolarização
+Sem informação",71.4%,73.7%,70.3%,73.2%,64.8%
+"Ocupação
+Do lar",28%,30.1%,27%,24.6%,27%
+"Ocupação
+Estudante",5.9%,5.1%,6.2%,6.6%,7.4%
+"Ocupação
+Autônoma",0.8%,1.4%,0.7%,0%,0%
+"Ocupação
+Vendedora",1.8%,2.9%,1.1%,0.8%,1.6%
+"Ocupação
+Desempregada",1.4%,1.4%,2%,0%,0%
+"Ocupação
+Outras",62.1%,59.1%,63%,68%,63.9%
