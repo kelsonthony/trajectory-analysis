@@ -2,7 +2,7 @@
 # % de permanência por estado de internação (por trajetória)
 # - Lê Banco_de_dados_final_0708_Trajetoria.xlsx (aba "Trajetoria")
 # - Constrói seq_long (id–semana–state) e clusters (id–traj)
-# - Figura, Tabela wide e Parágrafos descritivos por trajetória
+# - Figura (fundo branco), Tabela wide e Parágrafos descritivos
 # ================================================================
 
 # ---------- 0) Pacotes: checar/instalar ----------
@@ -25,8 +25,8 @@ states_bed <- c("UTIN","UCINCO","UCINCA","ENF")
 # ---------- 2) Helpers ----------
 norm_names <- function(x) {
   x <- trimws(x)
-  x <- stringi::stri_trans_general(x, "Latin-ASCII")  # remove acentos
-  x <- gsub("[^A-Za-z0-9]+","_", x)                  # pontuação -> _
+  x <- stringi::stri_trans_general(x, "Latin-ASCII")
+  x <- gsub("[^A-Za-z0-9]+","_", x)
   tolower(x)
 }
 
@@ -34,7 +34,6 @@ safe_as_datetime <- function(x) {
   if (inherits(x, c("POSIXct","POSIXt"))) return(as.POSIXct(x, tz = "UTC"))
   if (inherits(x, "Date"))                return(lubridate::as_datetime(x))
   if (is.numeric(x)) {
-    # Datas Excel (dias desde 1899-12-30)
     if (all(is.finite(x) & x > 10000 & x < 100000, na.rm = TRUE)) {
       return(lubridate::as_datetime(as.Date(x, origin = "1899-12-30")))
     } else {
@@ -55,7 +54,6 @@ first_that_exists <- function(cands, pool) {
 message("ℹ️  Construindo 'seq_long' e 'clusters' a partir de ", in_file)
 raw <- readxl::read_excel(in_file, sheet = sheet)
 
-# Detecta ID de forma robusta
 nm_norm <- norm_names(names(raw))
 id_idx <- which(nm_norm %in% c("id_rn","id","idrn","rn_id","id_do_rn","id_paciente"))
 if (length(id_idx) == 0) id_idx <- which(grepl("\\bid\\b.*rn|rn.*\\bid\\b", nm_norm))
@@ -63,7 +61,6 @@ if (length(id_idx) == 0) stop("Não encontrei coluna de ID (ex.: 'ID RN').")
 id_col <- names(raw)[id_idx[1]]
 message("✓ Coluna de ID detectada: '", id_col, "'")
 
-# Detecta coluna “trajetória” (cluster/tipo/traj)
 cl_idx <- which(grepl("(\\bcluster\\b|\\btraj\\w*\\b|\\btipo\\b)", nm_norm))
 if (length(cl_idx) == 0) stop("Não encontrei coluna de cluster/trajectória (ex.: 'Cluster').")
 clust_col <- names(raw)[cl_idx[1]]
@@ -75,7 +72,7 @@ cols_ucinco <- intersect(c("UCINCO 1","UCINCO 2","UCINCO 3"), names(raw))
 cols_ucinca <- intersect(c("UCINCA 1","UCINCA 2","UCINCA 3"), names(raw))
 col_enf     <- intersect("ENF/ALCON", names(raw))
 col_alta    <- intersect("D.ALTA.H",  names(raw))
-col_obito   <- intersect(c("D.ÓBITO","D.OBITO","D.ÓBITO "), names(raw))
+col_obito   <- intersect(c("D.ÓBITO","D.OBITO"), names(raw))
 
 stack_cols <- function(df, cols, unit) {
   if (!length(cols)) return(NULL)
@@ -112,7 +109,7 @@ events_long <- dplyr::bind_rows(ev_utin, ev_ucinco, ev_ucinca, ev_enf, ev_alta, 
 
 if (nrow(events_long) == 0) stop("Sem eventos datados para montar a sequência.")
 
-# ---------- 5) clusters (id, traj) a partir da coluna de trajetória ----------
+# ---------- 5) clusters (id, traj) ----------
 clusters <- raw |>
   dplyr::select(all_of(c(id_col, clust_col))) |>
   dplyr::rename(id = all_of(id_col), lab = all_of(clust_col)) |>
@@ -126,16 +123,13 @@ clusters <- raw |>
       is.na(traj) & grepl("tipo\\s*4", tolower(lab)) ~ 4,
       TRUE ~ traj
     ),
-    traj = as.character(traj)  # <- evita problemas de fator
+    traj = as.character(traj)
   ) |>
   dplyr::select(id, traj) |>
   dplyr::distinct()
 
-if (any(is.na(clusters$traj))) {
-  stop("Valores de trajetória não reconhecidos (ex.: não são 'Tipo 1..4' nem números).")
-}
+if (any(is.na(clusters$traj))) stop("Valores de trajetória não reconhecidos.")
 
-# níveis de trajetórias realmente presentes (ex.: pode haver só 1..3)
 traj_levels <- intersect(c("1","2","3","4"), sort(unique(clusters$traj)))
 
 # ---------- 6) Construir seq_long (id–semana–state) ----------
@@ -162,7 +156,7 @@ seq_long <- dplyr::bind_rows(lapply(seq_list, function(df_i) {
     state = factor(state, levels = states_all)
   )
 
-# ---------- 7) Preparar base final e tamanhos ----------
+# ---------- 7) Base final e tamanhos ----------
 dat <- seq_long |>
   dplyr::inner_join(clusters, by = "id") |>
   dplyr::mutate(traj = factor(traj, levels = traj_levels))
@@ -183,7 +177,7 @@ occ_pct <- dat |>
 
 occ_pct_bed <- occ_pct |> dplyr::filter(state %in% states_bed)
 
-# ---------- 9) Figura ----------
+# ---------- 9) Figura (fundo branco garantido) ----------
 occ_plot <- occ_pct_bed |>
   dplyr::left_join(traj_sizes |> dplyr::select(traj, lab_leg), by = "traj") |>
   dplyr::mutate(state = forcats::fct_relevel(state, states_bed))
@@ -201,12 +195,16 @@ p <- ggplot(occ_plot, aes(x = state, y = pct, fill = lab_leg)) +
        fill = "Trajetória",
        title = "Percentual de permanência por estado de internação, por trajetória") +
   theme_minimal(base_size = 12) +
-  theme(legend.position = "right",
-        panel.grid.minor = element_blank())
+  theme(
+    legend.position = "right",
+    panel.grid.minor = element_blank(),
+    plot.background  = element_rect(fill = "white", color = NA),
+    panel.background = element_rect(fill = "white", color = NA)
+  )
 
 print(p)
 ggplot2::ggsave(file.path(out_dir, "perc_permanencia_por_traj.png"),
-                p, width = 10, height = 6, dpi = 300)
+                p, width = 10, height = 6, dpi = 300, bg = "white")
 
 # ---------- 10) Tabela wide ----------
 occ_pct_wide <- occ_pct_bed |>
@@ -222,10 +220,10 @@ writexl::write_xlsx(list("Perc_permanencia_por_estado" = occ_pct_wide),
                     file.path(out_dir, "perc_permanencia_por_estado.xlsx"))
 
 # ---------- 11) Parágrafos descritivos ----------
-occ_pct_all <- occ_pct  # (inclui ALTA/OBITO se presentes)
+occ_pct_all <- occ_pct
 
 make_para <- function(traj_id, tbl, sizes_tbl) {
-  traj_id <- as.character(traj_id)  # <- padroniza para evitar Ops.factor()
+  traj_id <- as.character(traj_id)
   sizes  <- sizes_tbl |> dplyr::filter(as.character(traj) == traj_id)
   resumo <- tbl       |> dplyr::filter(as.character(traj) == traj_id)
 
@@ -254,7 +252,6 @@ make_para <- function(traj_id, tbl, sizes_tbl) {
   }
 }
 
-# usa apenas trajetórias realmente presentes
 descricoes <- tibble(
   traj = traj_levels,
   paragrafo = vapply(traj_levels,
